@@ -100,13 +100,17 @@ class Graph:
     def __deep_first_search_util(self,vertex, visited, destination):
         if vertex.data == destination:
             print(vertex.data)
-            return vertex
+            return vertex;
         else:
             print(vertex.data, end=" - ")
             for edges in vertex.edge_list:
                 if not (edges.vertex in visited):
                     visited.add(edges.vertex) 
-                    return self.__deep_first_search_util(edges.vertex, visited, destination)
+                    result = self.__deep_first_search_util(edges.vertex, visited, destination) 
+                    if result != None:
+                        return result
+                                 
+            return None
         
 
 
