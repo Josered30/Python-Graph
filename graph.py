@@ -1,23 +1,30 @@
+import gc
+import sys
+
 class Graph:
 
     class Vertex:
         def __init__(self, data):
             super().__init__()
-            self.data = data;  
-            self.next_vertex = None
-            self.edge_list = None  
+            self.data = data
+            self.edge_list = []
+
+        def __del__(self):
+            print("deleted")
 
     class Edge:
         def __init__(self, weight):
             super().__init__()
             self.weight = weight
-            self.next_edge = None
             self.vertex = None
+
+        def __del__(self):
+            print("deleted")
+    
 
     def __init__(self):
         super().__init__()
-        self.root = None
-
+        self.__vertexs = []
 
     def empty(self):
         if self.root == None:
@@ -25,63 +32,37 @@ class Graph:
         else:
             return False
 
-
-    def get_vertex(self,data):
-
-        aux = self.root
-  
-        while(aux != None):
-            if aux.data == data:
-                return aux
-            aux = aux.next_vertex           
-
-        return None
-
-
-    
-    def insert_vertex(self,data):
-
-        new_vertex = self.Vertex(data)
-        aux = self.root
         
-        if self.empty():
-            self.root = new_vertex
-        else:
-            while(aux.next_vertex != None):
-                aux = aux.next_vertex
-            aux.next_vertex = new_vertex
+    def get_vertex(self, data):
+        for i in range(len(self.__vertexs)):
+            if self.__vertexs[i].data == data:
+                return self.__vertexs[i]
 
-    
+
+    def insert_vertex(self, data):
+        self.__vertexs.append(self.Vertex(data))
+              
+
     def insert_edge(self, origin, destination, weight):
-        
-        aux = origin.edge_list
         new_edge = self.Edge(weight)
-
-        if(aux == None):
-            origin.edge_list = new_edge
-            new_edge.vertex = destination
-        else:
-            while(aux !=None):
-                aux= aux.next_edge
-            aux = new_edge
-            new_edge.vertex = destination
+        new_edge.destination = destination
+        origin.edge_list.append(new_edge)
         
+    def erase_all(self):
+        self.__vertexs.clear()
+       
 
-        
-
-
-
-        
-            
-
-
-
-
-            
+    def erase_edge(self, origin, destination):
+        for i in range(len(origin.edge_list)):
+            if origin.edge_list[i].destination:
+                del origin.edge_list[i]
 
 
-
-
-
-        
+    def erase_vertex(self, vertex):
+        self.__vertexs.remove(vertex)
     
+
+
+    
+    
+        

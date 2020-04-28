@@ -9,6 +9,6 @@ if __name__ == "__main__":
     destination = graph.get_vertex('B')
     graph.insert_edge(origin,destination,4)
 
-    print('')
+    graph.erase_edge(origin,destination)
 
-   
+    
