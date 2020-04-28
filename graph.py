@@ -9,8 +9,6 @@ class Graph:
             self.data = data
             self.edge_list = []
 
-        def __del__(self):
-            print("deleted")
 
     class Edge:
         def __init__(self, weight):
@@ -18,8 +16,6 @@ class Graph:
             self.weight = weight
             self.vertex = None
 
-        def __del__(self):
-            print("deleted")
     
 
     def __init__(self):
@@ -45,7 +41,7 @@ class Graph:
 
     def insert_edge(self, origin, destination, weight):
         new_edge = self.Edge(weight)
-        new_edge.destination = destination
+        new_edge.vertex = destination
         origin.edge_list.append(new_edge)
         
     def erase_all(self):
@@ -57,10 +53,41 @@ class Graph:
             if origin.edge_list[i].destination:
                 del origin.edge_list[i]
 
-
     def erase_vertex(self, vertex):
         self.__vertexs.remove(vertex)
+
     
+    def show(self):   
+       for vertex in self.__vertexs:
+            print(vertex.data, end="->")
+            for edges in vertex.edge_list:
+                print(edges.vertex.data, end="->")
+            print("")
+                
+
+    def breadth_first_search(self, destination):
+        queue = []
+        visited = set()
+
+        queue.append(self.__vertexs[0])
+        visited.add(self.__vertexs[0])
+  
+        while len(queue)> 0: 
+            vertex = queue.pop(0)
+            
+            if vertex.data == destination:
+                return vertex
+      
+            for edges in vertex.edge_list:
+                if not (edges.vertex in visited):
+                    queue.append(edges.vertex)
+                    visited.add(edges.vertex)
+
+        if vertex.data != destination:
+            return None  
+
+
+
 
 
     
