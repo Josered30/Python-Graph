@@ -74,10 +74,13 @@ class Graph:
   
         while len(queue)> 0: 
             vertex = queue.pop(0)
-            
+         
             if vertex.data == destination:
+                print(vertex.data)
                 return vertex
-      
+            
+            print(vertex.data, end=" - ")
+
             for edges in vertex.edge_list:
                 if not (edges.vertex in visited):
                     queue.append(edges.vertex)
@@ -86,7 +89,25 @@ class Graph:
         if vertex.data != destination:
             return None  
 
+    
 
+    def deep_first_search(self, destination):
+        visited = set()
+        visited.add(self.__vertexs[0])
+        return self.__deep_first_search_util(self.__vertexs[0], visited, destination)
+
+    
+    def __deep_first_search_util(self,vertex, visited, destination):
+        if vertex.data == destination:
+            print(vertex.data)
+            return vertex
+        else:
+            print(vertex.data, end=" - ")
+            for edges in vertex.edge_list:
+                if not (edges.vertex in visited):
+                    visited.add(edges.vertex) 
+                    return self.__deep_first_search_util(edges.vertex, visited, destination)
+        
 
 
 

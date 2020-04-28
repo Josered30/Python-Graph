@@ -25,15 +25,14 @@ def generateGraph(n_vertex, n_edges):
             i+=1
  
     return graph
-
-        
+      
 
 if __name__ == "__main__":
 
     graph = generateGraph(10,8)
     graph.show()
 
-    result = graph.breadth_first_search('e')
+    result = graph.deep_first_search('e')
 
     if result != None:
         print("Result: ", result.data)
