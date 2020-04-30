@@ -1,5 +1,15 @@
 import gc
 import sys
+import dictionary as dct
+
+class DisjktraElement:
+    def __init__(self, vertex):
+        super().__init__()
+        self.vertex=vertex
+        self.last_vertex=None
+        self.cost=None
+        self.visited=False
+
 
 class Graph:
 
@@ -111,6 +121,63 @@ class Graph:
                         return result
                                  
             return None
+
+    
+
+    def __dijstra_util(self, actual_vertex, table):
+
+        unvisited = []
+        finished = True
+   
+        for edge in actual_vertex.edge_list:
+            vertex_data = edge.vertex.data
+            new_cost = table[actual_vertex.data].cost+edge.weight
+
+            if table[vertex_data].cost == None or table[vertex_data].cost > new_cost:
+                table[vertex_data].cost = new_cost
+                table[vertex_data].last_vertex = actual_vertex
+            
+            if table[vertex_data].visited == False:
+                if finished:
+                    finished = False             
+                unvisited.append((vertex_data,table[vertex_data].cost))
+
+
+        if finished:
+            return table
+
+
+        min = [0,unvisited[0][1]]
+        for i in range(len(unvisited)):
+            if min[1] > unvisited[i][1]:
+                min[0] = i
+                min[1] = unvisited[i][1]
+
+        table[unvisited[min[0]][0]].visited = True
+        return self.__dijstra_util(table[unvisited[min[0]][0]].vertex, table)
+
+
+
+
+    def dijkstra(self, origin):
+
+        table = dct.dictionary()
+
+        element = DisjktraElement(self.__vertexs[0])
+        element.cost = 0
+
+        table.add(element.vertex.data, element)
+           
+        for i in range(1,len(self.__vertexs)):
+            element = DisjktraElement(self.__vertexs[i])
+            table.add(element.vertex.data, element)
+                
+        return self.__dijstra_util(origin,table)
+            
+
+        
+
+
         
 
 

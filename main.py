@@ -10,8 +10,7 @@ def generateGraph(n_vertex, n_edges):
 
     for i in range(n_vertex):
         graph.insert_vertex(alphabet[i])
-
-  
+ 
     i = 0
     while i< n_vertex:
 
@@ -23,19 +22,25 @@ def generateGraph(n_vertex, n_edges):
             graph.insert_edge(edge_1,edge_2, weight)
             graph.insert_edge(edge_2,edge_1, weight)
             i+=1
- 
+
     return graph
       
 
+
+
 if __name__ == "__main__":
 
-    graph = generateGraph(10,8)
+    graph = generateGraph(5,8)
     graph.show()
 
     result = graph.deep_first_search('e')
 
     if result != None:
         print("Result: ", result.data)
+
+
+    table = graph.dijkstra(graph.get_vertex('a')) 
+    print()
     
    
 
