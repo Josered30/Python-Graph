@@ -30,17 +30,16 @@ def generateGraph(n_vertex, n_edges):
 
 if __name__ == "__main__":
 
-    graph = generateGraph(5,8)
+    graph = generateGraph(10,8)
     graph.show()
 
-    result = graph.deep_first_search('e')
+    result = graph.limited_deep_first_search('e',2)
 
     if result != None:
         print("Result: ", result.data)
 
 
     table = graph.dijkstra(graph.get_vertex('a')) 
-    print()
     
    
 

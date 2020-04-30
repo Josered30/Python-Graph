@@ -124,7 +124,7 @@ class Graph:
 
     
 
-    def __dijstra_util(self, actual_vertex, table):
+    def __dijkstra_util(self, actual_vertex, table):
 
         unvisited = []
         finished = True
@@ -154,7 +154,7 @@ class Graph:
                 min[1] = unvisited[i][1]
 
         table[unvisited[min[0]][0]].visited = True
-        return self.__dijstra_util(table[unvisited[min[0]][0]].vertex, table)
+        return self.__dijkstra_util(table[unvisited[min[0]][0]].vertex, table)
 
 
 
@@ -172,8 +172,40 @@ class Graph:
             element = DisjktraElement(self.__vertexs[i])
             table.add(element.vertex.data, element)
                 
-        return self.__dijstra_util(origin,table)
+        return self.__dijkstra_util(origin,table)
             
+
+    def limited_deep_first_search(self, destination, limit):
+        visited = set()
+        #visited.add(self.__vertexs[0])
+        return self.__limited_deep_first_search_util(self.__vertexs[0], visited, destination,limit,0)
+
+    
+    def __limited_deep_first_search_util(self,vertex, visited, destination, limit, deep_counter):
+        if vertex.data == destination:
+            print(vertex.data)
+            return vertex;
+        else:
+            print(vertex.data, end=" - ")
+            for edges in vertex.edge_list:
+                if not (edges.vertex in visited) and deep_counter < limit:
+                    #visited.add(edges.vertex) 
+                    result = self.__limited_deep_first_search_util(edges.vertex, visited, destination, limit, deep_counter+1) 
+                    if result != None:
+                        return result                                           
+            return None
+
+
+    def iterative_deepening_first_search(self, destination, limit):
+
+        i = 0 
+        result = self.limited_deep_first_search(destination,i)
+
+        while result.data != destination or result.data!= None:
+             result = self.limited_deep_first_search(destination,i)
+        
+        return result
+
 
         
 
