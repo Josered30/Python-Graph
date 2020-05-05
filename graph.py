@@ -110,7 +110,7 @@ class Graph:
     def __deep_first_search_util(self,vertex, visited, destination):
         if vertex.data == destination:
             print(vertex.data)
-            return vertex;
+            return vertex
         else:
             print(vertex.data, end=" - ")
             for edges in vertex.edge_list:
@@ -123,6 +123,41 @@ class Graph:
             return None
 
     
+    def __deep_first_search_util_2(self,vertex, visited, stack):
+        if len(visited) == len(self.__vertexs):
+            #print(vertex.data)
+            return vertex     
+        else:
+            #print(vertex.data)
+            for edges in vertex.edge_list:
+                if not (edges.vertex in visited):
+                    visited.add(edges.vertex) 
+                    stack.append(self.__deep_first_search_util_2(edges.vertex,visited,stack)) 
+            return vertex
+
+            
+          
+    
+    
+    def topologicOrder(self):
+
+        visited = set()
+        visited.add(self.__vertexs[0])
+        stack = []
+        
+        for i in self.__vertexs:
+            if (i != self.__vertexs[0] and i in visited):
+                continue
+
+            self.__deep_first_search_util_2(i, visited, stack)
+            visited.add(i)
+            stack.append(i)
+
+        while len(stack) > 0:
+            print(stack.pop().data, end = " - ")
+        print("")
+ 
+
 
     def __dijkstra_util(self, actual_vertex, table):
 
@@ -207,7 +242,8 @@ class Graph:
         return result
 
 
-        
+  
+
 
 
         
