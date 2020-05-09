@@ -231,13 +231,14 @@ class Graph:
             return None
 
 
-    def iterative_deepening_first_search(self, destination, limit):
+    def iterative_deepening_first_search(self, destination):
 
         i = 0 
         result = self.limited_deep_first_search(destination,i)
 
         while result.data != destination or result.data!= None:
              result = self.limited_deep_first_search(destination,i)
+             i+=1
         
         return result
 
