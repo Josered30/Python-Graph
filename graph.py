@@ -211,21 +211,18 @@ class Graph:
             
 
     def limited_deep_first_search(self, destination, limit):
-        visited = set()
-        #visited.add(self.__vertexs[0])
-        return self.__limited_deep_first_search_util(self.__vertexs[0], visited, destination,limit,0)
+        return self.__limited_deep_first_search_util(self.__vertexs[0], destination,limit,0)
 
     
-    def __limited_deep_first_search_util(self,vertex, visited, destination, limit, deep_counter):
+    def __limited_deep_first_search_util(self,vertex, destination, limit, deep_counter):
         if vertex.data == destination:
             print(vertex.data)
             return vertex;
         else:
             print(vertex.data, end=" - ")
             for edges in vertex.edge_list:
-                if not (edges.vertex in visited) and deep_counter < limit:
-                    #visited.add(edges.vertex) 
-                    result = self.__limited_deep_first_search_util(edges.vertex, visited, destination, limit, deep_counter+1) 
+                if deep_counter < limit:
+                    result = self.__limited_deep_first_search_util(edges.vertex, destination, limit, deep_counter+1) 
                     if result != None:
                         return result                                           
             return None
