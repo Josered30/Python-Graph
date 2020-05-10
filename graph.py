@@ -122,8 +122,17 @@ class Graph:
                                  
             return None
 
-    
-    def __deep_first_search_util_2(self,vertex, visited, stack):
+
+    def deep_first_path_stack(self, origin):
+        stack = []
+        visited = set()
+        visited.add(origin)
+
+        self.__deep_first_path_stack_util(origin, visited, stack) 
+        return stack
+
+
+    def deep_first_path_stack_util(self,vertex, visited, stack):
         if len(visited) == len(self.__vertexs):
             #print(vertex.data)
             return vertex     
@@ -132,13 +141,10 @@ class Graph:
             for edges in vertex.edge_list:
                 if not (edges.vertex in visited):
                     visited.add(edges.vertex) 
-                    stack.append(self.__deep_first_search_util_2(edges.vertex,visited,stack)) 
+                    stack.append(self.deep_first_path_stack_util(edges.vertex,visited,stack)) 
             return vertex
 
-            
-          
-    
-    
+
     def topologicOrder(self):
 
         visited = set()
@@ -149,14 +155,13 @@ class Graph:
             if (i != self.__vertexs[0] and i in visited):
                 continue
 
-            self.__deep_first_search_util_2(i, visited, stack)
+            self.deep_first_path_stack_util(i, visited, stack)
             visited.add(i)
             stack.append(i)
 
         while len(stack) > 0:
             print(stack.pop().data, end = " - ")
         print("")
- 
 
 
     def __dijkstra_util(self, actual_vertex, table):
@@ -190,8 +195,6 @@ class Graph:
 
         table[unvisited[min[0]][0]].visited = True
         return self.__dijkstra_util(table[unvisited[min[0]][0]].vertex, table)
-
-
 
 
     def dijkstra(self, origin):
@@ -229,7 +232,6 @@ class Graph:
 
 
     def iterative_deepening_first_search(self, destination):
-
         i = 0 
         result = self.limited_deep_first_search(destination,i)
 
@@ -238,6 +240,66 @@ class Graph:
              i+=1
         
         return result
+
+
+    def transpose_graph(self):       
+        new_graph = Graph()
+
+        for i in self.__vertexs:
+            new_graph.insert_vertex(i.data)
+
+        for i in self.__vertexs:
+            for j in i.edge_list:
+                new_graph.insert_edge(new_graph.get_vertex(j.vertex.data), new_graph.get_vertex(i.data),0)
+
+        return new_graph
+
+
+
+    def kosaraju(self):
+        stack = []
+        done = []
+
+        visited = set() 
+        for i in self.__vertexs:
+            if len(stack) == 0 or i not in stack:
+                visited.add(i)
+                self.deep_first_path_stack_util(i,visited,stack)   
+                stack.append(i)
+
+
+        transpose_graph = self.transpose_graph()
+        visited = set()
+
+        while len(stack) > 0:
+
+            strongly_connected = []
+            transpose_vertex = transpose_graph.get_vertex(stack.pop().data) 
+
+            if transpose_vertex not in done:
+                visited.add(transpose_vertex) 
+                transpose_graph.deep_first_path_stack_util(transpose_vertex,visited,strongly_connected)
+                strongly_connected.append(transpose_vertex)        
+                done.extend(strongly_connected)
+            
+                strongly_connected.reverse()
+                for i in strongly_connected:
+                    print(i.data, end = " ")                 
+                print()
+            
+
+                
+
+                     
+        
+
+        
+        
+        
+
+        
+
+
 
 
   

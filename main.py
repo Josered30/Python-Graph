@@ -3,26 +3,22 @@ import random
 import string
 
 
-def generate_graph():
-
+def generate_graph_test():
     graph = gp.Graph()
 
-    graph.insert_vertex(0)
-    graph.insert_vertex(1)
-    graph.insert_vertex(2)
-    graph.insert_vertex(3)
-    graph.insert_vertex(4)
-    graph.insert_vertex(5)
-    graph.insert_vertex(6)
-    graph.insert_vertex(7)
-
-  
+    for i in range(9):
+        graph.insert_vertex(i)
+   
     graph.insert_edge(graph.get_vertex(0),graph.get_vertex(1),0)
-    graph.insert_edge(graph.get_vertex(0),graph.get_vertex(4),0)
-    graph.insert_edge(graph.get_vertex(3),graph.get_vertex(5),0)
-    graph.insert_edge(graph.get_vertex(4),graph.get_vertex(6),0)
-    graph.insert_edge(graph.get_vertex(4),graph.get_vertex(7),0)
-    graph.insert_edge(graph.get_vertex(6),graph.get_vertex(7),0)
+    graph.insert_edge(graph.get_vertex(1),graph.get_vertex(2),0)
+    graph.insert_edge(graph.get_vertex(2),graph.get_vertex(3),0)
+    graph.insert_edge(graph.get_vertex(3),graph.get_vertex(0),0)
+    graph.insert_edge(graph.get_vertex(2),graph.get_vertex(4),0)
+    graph.insert_edge(graph.get_vertex(4),graph.get_vertex(5),0)
+    graph.insert_edge(graph.get_vertex(5),graph.get_vertex(6),0)
+    graph.insert_edge(graph.get_vertex(6),graph.get_vertex(4),0)
+    graph.insert_edge(graph.get_vertex(7),graph.get_vertex(6),0)
+    graph.insert_edge(graph.get_vertex(7),graph.get_vertex(8),0)
 
     return graph
 
@@ -70,10 +66,11 @@ def generate_graph(n_vertex, n_edges, undirected):
 
 if __name__ == "__main__":
 
-    graph = generate_graph(10, 8, False)
+    graph = generate_graph_test()
     graph.show()
-
-    graph.topologicOrder()
+    
+    print("\nKosaraju: ")
+    graph.kosaraju()    
 
 
     #result = graph.limited_deep_first_search('e',2)
