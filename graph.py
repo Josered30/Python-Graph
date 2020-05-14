@@ -1,5 +1,3 @@
-import gc
-import sys
 import dictionary as dct
 
 class DisjktraElement:
@@ -173,6 +171,7 @@ class Graph:
             vertex_data = edge.vertex.data
             new_cost = table[actual_vertex.data].cost+edge.weight
 
+            #Relax
             if table[vertex_data].cost == None or table[vertex_data].cost > new_cost:
                 table[vertex_data].cost = new_cost
                 table[vertex_data].last_vertex = actual_vertex
@@ -183,10 +182,11 @@ class Graph:
                 unvisited.append((vertex_data,table[vertex_data].cost))
 
 
+        #True if there are not other vertexs to visit
         if finished:
             return table
 
-
+        #Choose min weight to continue
         min = [0,unvisited[0][1]]
         for i in range(len(unvisited)):
             if min[1] > unvisited[i][1]:
@@ -211,7 +211,8 @@ class Graph:
             table.add(element.vertex.data, element)
                 
         return self.__dijkstra_util(origin,table)
-            
+
+
 
     def limited_deep_first_search(self, destination, limit):
         return self.__limited_deep_first_search_util(self.__vertexs[0], destination,limit,0)
@@ -233,10 +234,11 @@ class Graph:
 
     def iterative_deepening_first_search(self, destination):
         i = 0 
-        result = self.limited_deep_first_search(destination,i)
-
-        while result.data != destination or result.data!= None:
+        result = None
+        
+        while result == None or result.data != destination:
              result = self.limited_deep_first_search(destination,i)
+             print(" ")
              i+=1
         
         return result

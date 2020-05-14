@@ -22,8 +22,6 @@ def generate_graph_test():
 
     return graph
 
-
-
 def validate_undirected(vertex_1,vertex_2):
 
     for i in vertex_1.edge_list:
@@ -68,15 +66,12 @@ if __name__ == "__main__":
 
     graph = generate_graph_test()
     graph.show()
-    
-    print("\nKosaraju: ")
-    graph.kosaraju()    
 
 
-    #result = graph.limited_deep_first_search('e',2)
+    result = graph.limited_deep_first_search('e',2)
 
-    #if result != None:
-    #    print("Result: ", result.data)
+    if result != None:
+        print("Result: ", result.data)
 
     #table = graph.dijkstra(graph.get_vertex('a')) 
 
