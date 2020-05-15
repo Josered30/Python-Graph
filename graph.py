@@ -1,11 +1,13 @@
 import dictionary as dct
+import heap 
+import sys
 
 class DisjktraElement:
     def __init__(self, vertex):
         super().__init__()
         self.vertex=vertex
         self.last_vertex=None
-        self.cost=None
+        self.cost=sys.maxsize
         self.visited=False
 
 
@@ -162,55 +164,56 @@ class Graph:
         print("")
 
 
-    def __dijkstra_util(self, actual_vertex, table):
+    def __get_element_index(self, priority_queue, element):  
+        for i in range(priority_queue.heap_size):
+            if priority_queue.get_element(i) == element:
+                return i
 
-        unvisited = []
+    def __dijkstra_util(self, actual_vertex, dijkstra_elements, priority_queue):
+
         finished = True
-   
-        for edge in actual_vertex.edge_list:
-            vertex_data = edge.vertex.data
-            new_cost = table[actual_vertex.data].cost+edge.weight
 
-            #Relax
-            if table[vertex_data].cost == None or table[vertex_data].cost > new_cost:
-                table[vertex_data].cost = new_cost
-                table[vertex_data].last_vertex = actual_vertex
-            
-            if table[vertex_data].visited == False:
-                if finished:
-                    finished = False             
-                unvisited.append((vertex_data,table[vertex_data].cost))
+        for edge in actual_vertex.vertex.edge_list:
+            element = dijkstra_elements[edge.vertex.data]
+            new_cost = actual_vertex.cost + edge.weight
+             
+            if element.visited == False: 
 
+                #Relaxation 
+                if element.cost > new_cost:
+                    element.cost = new_cost
+                    element.last_vertex = actual_vertex
 
-        #True if there are not other vertexs to visit
+                    if element not in priority_queue.get_heap():
+                        priority_queue.insert(element)
+                    else:
+                        priority_queue.update_v2(self.__get_element_index(priority_queue,element),element)
+                        
+                if finished== True and element.visited == False:
+                    finished = False  
+
         if finished:
-            return table
+            return dijkstra_elements
 
-        #Choose min weight to continue
-        min = [0,unvisited[0][1]]
-        for i in range(len(unvisited)):
-            if min[1] > unvisited[i][1]:
-                min[0] = i
-                min[1] = unvisited[i][1]
+        top_element = priority_queue.extract()
+        top_element.visited = True
+        return self.__dijkstra_util(top_element, dijkstra_elements, priority_queue)
 
-        table[unvisited[min[0]][0]].visited = True
-        return self.__dijkstra_util(table[unvisited[min[0]][0]].vertex, table)
 
 
     def dijkstra(self, origin):
+        priority_queue = heap.Heap(lambda a,b:(a.cost < b.cost),False)
+        dijkstra_elements = dct.dictionary()
 
-        table = dct.dictionary()
+        for i in self.__vertexs:
+            dijkstra_elements.add(i.data, DisjktraElement(i))
+        
+        origin_element = dijkstra_elements[origin]
+        origin_element.cost = 0
+        origin_element.visited = True
+      
+        return self.__dijkstra_util(origin_element, dijkstra_elements, priority_queue)
 
-        element = DisjktraElement(self.__vertexs[0])
-        element.cost = 0
-
-        table.add(element.vertex.data, element)
-           
-        for i in range(1,len(self.__vertexs)):
-            element = DisjktraElement(self.__vertexs[i])
-            table.add(element.vertex.data, element)
-                
-        return self.__dijkstra_util(origin,table)
 
 
 

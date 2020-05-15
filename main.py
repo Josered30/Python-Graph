@@ -1,6 +1,8 @@
 import graph as gp 
 import random
 import string
+import heap 
+
 
 
 def generate_graph_test():
@@ -9,15 +11,15 @@ def generate_graph_test():
     for i in range(9):
         graph.insert_vertex(i)
    
-    graph.insert_edge(graph.get_vertex(0),graph.get_vertex(1),0)
-    graph.insert_edge(graph.get_vertex(1),graph.get_vertex(2),0)
-    graph.insert_edge(graph.get_vertex(2),graph.get_vertex(3),0)
-    graph.insert_edge(graph.get_vertex(3),graph.get_vertex(0),0)
-    graph.insert_edge(graph.get_vertex(2),graph.get_vertex(4),0)
-    graph.insert_edge(graph.get_vertex(4),graph.get_vertex(5),0)
-    graph.insert_edge(graph.get_vertex(5),graph.get_vertex(6),0)
-    graph.insert_edge(graph.get_vertex(6),graph.get_vertex(4),0)
-    graph.insert_edge(graph.get_vertex(7),graph.get_vertex(6),0)
+    graph.insert_edge(graph.get_vertex(0),graph.get_vertex(1),4)
+    graph.insert_edge(graph.get_vertex(1),graph.get_vertex(2),7)
+    graph.insert_edge(graph.get_vertex(2),graph.get_vertex(3),1)
+    graph.insert_edge(graph.get_vertex(3),graph.get_vertex(0),8)
+    graph.insert_edge(graph.get_vertex(2),graph.get_vertex(4),3)
+    graph.insert_edge(graph.get_vertex(4),graph.get_vertex(5),4)
+    graph.insert_edge(graph.get_vertex(5),graph.get_vertex(6),6)
+    graph.insert_edge(graph.get_vertex(6),graph.get_vertex(4),1)
+    graph.insert_edge(graph.get_vertex(7),graph.get_vertex(6),4)
     graph.insert_edge(graph.get_vertex(7),graph.get_vertex(8),0)
 
     return graph
@@ -36,6 +38,13 @@ def validate_undirected(vertex_1,vertex_2):
     
 
 
+def validate_edges(vertex_1,vertex_2):
+    for edges in vertex_1.edge_list:
+        if edges.vertex == vertex_2:
+            return False
+    return True
+    
+
 def generate_graph(n_vertex, n_edges, undirected):
 
     graph = gp.Graph()
@@ -45,11 +54,11 @@ def generate_graph(n_vertex, n_edges, undirected):
         graph.insert_vertex(alphabet[i])
  
     i = 0
-    while i< n_vertex:
+    while i< n_edges:
         vertex_1 = graph.get_vertex(alphabet[random.randint(0,n_vertex-1)])
         vertex_2 = graph.get_vertex(alphabet[random.randint(0,n_vertex-1)])
 
-        if vertex_1 != vertex_2:
+        if vertex_1 != vertex_2 and validate_edges(vertex_1,vertex_2):
             weight = random.randint(0,20)
             graph.insert_edge(vertex_1, vertex_2, weight)
 
@@ -63,21 +72,14 @@ def generate_graph(n_vertex, n_edges, undirected):
 
 
 if __name__ == "__main__":
-
-    graph = generate_graph_test()
+    graph = generate_graph(5,15,False)
     graph.show()
 
-
-    result = graph.limited_deep_first_search('e',2)
-
-    if result != None:
-        print("Result: ", result.data)
-
-    #table = graph.dijkstra(graph.get_vertex('a')) 
+    result = graph.dijkstra('a')
+    print("")
 
     
     
-   
 
    
 
