@@ -54,8 +54,8 @@ class Heap(object):
                 self.__heapify_down_util(index)
             elif data < element:
                 self.__heapify_up_util(index)    
-        else:
-            if data < element: #Min Heap
+        else:  #Min Heap
+            if data < element:
                 self.__heapify_down_util(index)
             elif data > element:
                 self.__heapify_up_util(index)    

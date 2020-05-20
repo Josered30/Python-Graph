@@ -5,8 +5,8 @@ import heap
 
 
 
-def generate_graph_test():
-    graph = gp.Graph()
+def generate_graph_test(undirected):
+    graph = gp.Graph(undirected)
 
     for i in range(9):
         graph.insert_vertex(i)
@@ -18,8 +18,8 @@ def generate_graph_test():
     graph.insert_edge(graph.get_vertex(2),graph.get_vertex(4),3)
     graph.insert_edge(graph.get_vertex(4),graph.get_vertex(5),4)
     graph.insert_edge(graph.get_vertex(5),graph.get_vertex(6),6)
-    graph.insert_edge(graph.get_vertex(6),graph.get_vertex(4),1)
-    graph.insert_edge(graph.get_vertex(7),graph.get_vertex(6),4)
+    #graph.insert_edge(graph.get_vertex(6),graph.get_vertex(4),e)
+    #graph.insert_edge(graph.get_vertex(7),graph.get_vertex(6),e)
     graph.insert_edge(graph.get_vertex(7),graph.get_vertex(8),0)
 
     return graph
@@ -47,7 +47,7 @@ def validate_edges(vertex_1,vertex_2):
 
 def generate_graph(n_vertex, n_edges, undirected):
 
-    graph = gp.Graph()
+    graph = gp.Graph(undirected)
     alphabet = list(string.ascii_lowercase)
 
     for i in range(n_vertex):
@@ -58,12 +58,9 @@ def generate_graph(n_vertex, n_edges, undirected):
         vertex_1 = graph.get_vertex(alphabet[random.randint(0,n_vertex-1)])
         vertex_2 = graph.get_vertex(alphabet[random.randint(0,n_vertex-1)])
 
-        if vertex_1 != vertex_2 and validate_edges(vertex_1,vertex_2):
+        if vertex_1 != vertex_2 and ((not undirected and validate_edges(vertex_1,vertex_2)) or (undirected and validate_undirected(vertex_1,vertex_2))):
             weight = random.randint(0,20)
-            graph.insert_edge(vertex_1, vertex_2, weight)
-
-            if undirected and validate_undirected(vertex_1,vertex_2) == True:
-                graph.insert_edge(vertex_2, vertex_1 , weight)     
+            graph.insert_edge(vertex_1, vertex_2, weight)  
             i+=1
 
     return graph
@@ -72,11 +69,10 @@ def generate_graph(n_vertex, n_edges, undirected):
 
 
 if __name__ == "__main__":
-    graph = generate_graph(5,15,False)
+    graph = generate_graph_test(True)
     graph.show()
-
-    result = graph.dijkstra('a')
-    print("")
+ 
+    print(graph.check_cicles_undirected_bps())
 
     
     
