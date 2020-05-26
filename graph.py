@@ -2,13 +2,15 @@ import dictionary as dct
 import heap 
 import sys
 
-class DisjktraElement:
+class InfoElement:
     def __init__(self, vertex):
         super().__init__()
         self.vertex=vertex
         self.last_vertex=None
         self.cost=sys.maxsize
+        self.accumulated_cost = sys.maxsize
         self.visited=False
+    
     
 
 class Graph:
@@ -26,8 +28,8 @@ class Graph:
             super().__init__()
             self.weight = weight
             self.source_vertex = None
-            self.target_vertex = None 
-
+            self.target_vertex = None
+        
 
     def __init__(self, undirected = False):
         super().__init__()
@@ -50,27 +52,32 @@ class Graph:
                 return self.__vertexs[i]
 
 
+    def get_vertex_by_index(self, index):
+        return self.__vertexs[index]
+        
+
     def insert_vertex(self, data):
         self.__vertexs.append(self.Vertex(data,self.size))
         self.size += 1
                   
 
     def insert_edge(self, origin, destination, weight):
-
         new_edge = self.Edge(weight)
-
         new_edge.source_vertex = origin   
         new_edge.target_vertex = destination
         origin.edge_list.append(new_edge)
 
+    def get_weight(self,origin,destination):
+        for edges in origin.edge_list:
+            if edges.target_vertex == destination:
+                return edges.weight 
 
-        if self.undirected: 
-            new_edge = self.Edge(weight)
-
-            new_edge.source_vertex = destination   
-            new_edge.target_vertex = origin
-            destination.edge_list.append(new_edge)
-
+    
+    def validate_edges(self,origin,destination):
+        for edges in origin.edge_list:
+            if edges.target_vertex == destination:
+                return False
+        return True
 
     def erase_all(self):
         self.__vertexs.clear()
@@ -80,11 +87,6 @@ class Graph:
         for i in range(len(origin.edge_list)):
             if origin.edge_list[i].destination:
                 del origin.edge_list[i]
-        
-        if self.undirected:  
-            for i in range(len(destination.edge_list)):
-                if destination.edge_list[i].origin:
-                    del destination.edge_list[i]
 
 
     def __erase_vertex_util(self, vertex, deleted_vertex):
@@ -110,9 +112,9 @@ class Graph:
 
     def show(self):   
        for vertex in self.__vertexs:
-            print(vertex.data, end="->")
+            print(vertex.data, end="=>")
             for edges in vertex.edge_list:
-                print(edges.target_vertex.data, end="->")
+                print(f"-{edges.weight}->{edges.target_vertex.data}", end=" ")
             print("")
                 
 
@@ -229,56 +231,32 @@ class Graph:
                     stack.append(self.deep_first_path_stack_util(edges.target_vertex,visited,stack)) 
             return vertex
 
-            
-    def __deep_first_path_cycle_directed_util(self,vertex, visited):
-        if len(visited) == len(self.__vertexs):
-            #print(vertex.data)
-            return False  
-        else:
-            #print(vertex.data)
-            for edges in vertex.edge_list:
-                if not (edges.target_vertex in visited):
-                    visited.add(edges.target_vertex) 
-                    return self.__deep_first_path_cycle_directed_util(edges.target_vertex,visited)
-                else:
-                    print(f"There is a cycle in the edge {vertex.data} - {edges.target_vertex.data}")
-                    return True
-            return False
         
                  
-    def __deep_first_path_cycle_undirected_util(self,vertex, visited):
+    def __deep_first_path_cycle_util(self,vertex, visited, undirected):
+
         if len(visited) == len(self.__vertexs):
             #print(vertex.data)
             return False  
         else:
             #print(vertex.data)
-            for edges in vertex.edge_list:
-                if edges.target_vertex in visited and edges.target_vertex != vertex:
-                    print(f"There is a cycle in the edge {vertex.data} - {edges.target_vertex.data}")
-                    return True        
+            for edges in vertex.edge_list:              
+                if undirected:
+                    if edges.target_vertex in visited and edges.target_vertex != vertex:
+                        print(f"There is a cycle in the edge {vertex.data} - {edges.target_vertex.data}")
+                        return True        
+                    else:
+                        visited.add(edges.target_vertex) 
+                        return self.__deep_first_path_cycle__util(edges.target_vertex,visited, undirected)
                 else:
-                    visited.add(edges.target_vertex) 
-                    return self.__deep_first_path_cycle_directed_util(edges.target_vertex,visited)            
-            return False
-
-
-    def topologicOrder(self):
-
-        visited = set()
-        visited.add(self.__vertexs[0])
-        stack = []
+                    if not (edges.target_vertex in visited):
+                        visited.add(edges.target_vertex) 
+                        return self.__deep_first_path_cycle__util(edges.target_vertex,visited)
+                    else:
+                        print(f"There is a cycle in the edge {vertex.data} - {edges.target_vertex.data}")
+                        return True
         
-        for i in self.__vertexs:
-            if (i != self.__vertexs[0] and i in visited):
-                continue
-
-            self.deep_first_path_stack_util(i, visited, stack)
-            visited.add(i)
-            stack.append(i)
-
-        while len(stack) > 0:
-            print(stack.pop().data, end = " - ")
-        print("")
+            return False
 
 
     def __get_element_index(self, priority_queue, element):  
@@ -286,19 +264,33 @@ class Graph:
             if priority_queue.get_element(i) == element:
                 return i
 
-    def __dijkstra_util(self, actual_vertex, dijkstra_elements, priority_queue):
+            
+    def __graph_from_dictionary(self, elements_dictionary):  
+        graph = Graph(self.undirected)
 
-        finished = True
+        for vertexs in self.__vertexs:
+            graph.insert_vertex(vertexs.data)
+
+        for key, elements in elements_dictionary.items():
+            if elements.last_vertex != None:
+                origin = graph.get_vertex_by_index(elements.last_vertex.vertex.index)
+                target = graph.get_vertex_by_index(elements.vertex.index)
+                weight = elements.cost
+                graph.insert_edge(origin,target, weight)
         
+        return graph
+
+
+    def __dijkstra_util(self, actual_vertex, dijkstra_elements, priority_queue):
         for edge in actual_vertex.vertex.edge_list:
             element = dijkstra_elements[edge.target_vertex.data]
-            new_cost = actual_vertex.cost + edge.weight
+            new_cost = actual_vertex.accumulated_cost + edge.weight
              
             if element.visited == False: 
-
                 #Relaxation 
-                if element.cost > new_cost:
-                    element.cost = new_cost
+                if element.accumulated_cost > new_cost:
+                    element.cost = edge.weight
+                    element.accumulated_cost = new_cost
                     element.last_vertex = actual_vertex
 
                     if element not in priority_queue.get_heap():
@@ -306,12 +298,8 @@ class Graph:
                     else:
                         priority_queue.update_v2(self.__get_element_index(priority_queue,element),element)
 
-                #At least one element to visit        
-                if finished== True and element.visited == False:
-                    finished = False  
-
         #No others elements to visit
-        if finished:
+        if priority_queue.heap_size == 0:
             return dijkstra_elements
 
         #Lightest vertex
@@ -320,21 +308,70 @@ class Graph:
         return self.__dijkstra_util(top_element, dijkstra_elements, priority_queue)
 
 
-
     def dijkstra(self, origin):
         priority_queue = heap.Heap(lambda a,b:(a.cost < b.cost),False)
         dijkstra_elements = dct.dictionary()
 
         for i in self.__vertexs:
-            dijkstra_elements.add(i.data, DisjktraElement(i))
+            dijkstra_elements.add(i.data, InfoElement(i))
         
         origin_element = dijkstra_elements[origin]
         origin_element.cost = 0
+        origin_element.accumulated_cost = 0
         origin_element.visited = True
-      
-        return self.__dijkstra_util(origin_element, dijkstra_elements, priority_queue)
+
+        dijkstra_list = self.__dijkstra_util(origin_element, dijkstra_elements, priority_queue)
+
+        return self.__graph_from_dictionary(dijkstra_list)
 
 
+
+    def __prim_util(self, actual_vertex, prim_elements, priority_queue):
+        
+        for edge in actual_vertex.vertex.edge_list:
+            element = prim_elements[edge.target_vertex.data]
+   
+            if element.visited == False: 
+                #Relaxation
+                if element.cost > edge.weight:
+                    element.cost = edge.weight
+                    element.last_vertex = actual_vertex 
+
+                    if element not in priority_queue.get_heap():
+                        priority_queue.insert(element)
+                    else:
+                        priority_queue.update_v2(self.__get_element_index(priority_queue,element), element)
+
+        #No others elements to visit
+        if priority_queue.heap_size == 0:
+            return prim_elements
+
+        #Lightest vertex
+        top_element = priority_queue.extract()
+        top_element.visited = True
+        return self.__prim_util(top_element, prim_elements, priority_queue)
+
+
+
+
+    def prim(self,origin):
+
+        priority_queue = heap.Heap(lambda a,b:(a.cost < b.cost),False)
+        prim_elements = dct.dictionary()
+        
+        for i in self.__vertexs:
+            prim_elements.add(i.data, InfoElement(i))
+        
+        origin_element = prim_elements[origin]
+        origin_element.cost = 0
+        origin_element.visited = True
+
+        minimun_list = self.__prim_util(origin_element, prim_elements, priority_queue)
+       
+        return self.__graph_from_dictionary(minimun_list)
+
+        
+        
     def limited_deep_first_search(self, destination, limit):
         return self.__limited_deep_first_search_util(self.__vertexs[0], destination,limit,0)
 
@@ -366,14 +403,14 @@ class Graph:
 
 
     def transpose_graph(self):       
-        new_graph = Graph()
+        new_graph = Graph(self.undirected)
 
-        for i in self.__vertexs:
-            new_graph.insert_vertex(i.data)
+        for vertexs in self.__vertexs:
+            new_graph.insert_vertex(vertexs.data)
 
-        for i in self.__vertexs:
-            for j in i.edge_list:
-                new_graph.insert_edge(new_graph.get_vertex(j.target_vertex.data), new_graph.get_vertex(i.data),0)
+        for vertexs in self.__vertexs:
+            for edges in vertexs.edge_list:
+                    new_graph.insert_edge(new_graph.get_vertex_by_index(edges.target_vertex.index), new_graph.get_vertex_by_index(vertexs.index), edges.weight)
 
         return new_graph
 
@@ -476,12 +513,12 @@ class Graph:
             for j in i.edge_list:
                 parent_a  = self.__find(arr, i.index)
                 parent_b  = self.__find(arr, j.target_vertex.index)
-
-                if parent_a != parent_b:
+                if parent_a != parent_b and (arr[i.index] == -1 or arr[j.target_vertex.index] == -1):
                     self.__union(arr, i.index, j.target_vertex.index)
                 else:
                     print(f"The edge of vertex: {i.data} and {j.target_vertex.data} produces a cicle")
                     return True
+
         return False
 
 
@@ -491,19 +528,15 @@ class Graph:
 
     def check_cicles_dps(self):
         visited = set()
-        algorithm = self.__deep_first_path_cycle_undirected_util if self.undirected else self.__deep_first_path_cycle_directed_util
-
+      
         for i in self.__vertexs: 
             if i not in visited:
                 visited.add(i)
-                if algorithm(i,visited):
+                if self.__deep_first_path_cycle_util(i,visited, self.undirected):
                     return True
                
         return False
 
     
-
-    
-
                 
     
