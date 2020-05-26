@@ -50,15 +50,15 @@ class Heap(object):
         self.__heap[index] = data
 
         if self.heap_type == True: #Max Heap
-            if data > element:
-                self.__heapify_down_util(index)
-            elif data < element:
-                self.__heapify_up_util(index)    
+            if self.comparation(data, element): # a > b
+                self.__heapify_up_util(index)
+            else:
+                self.__heapify_down_util(index)    
         else:  #Min Heap
-            if data < element:
-                self.__heapify_down_util(index)
-            elif data > element:
-                self.__heapify_up_util(index)    
+            if self.comparation(data, element): # a < b
+                self.__heapify_up_util(index)
+            else: 
+                self.__heapify_down_util(index)    
 
 
     def update_v2(self, index, new_data):
