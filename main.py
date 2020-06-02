@@ -2,6 +2,8 @@ import graph as gp
 import random
 import string
 import heap 
+import clusters
+
 
 def generate_graph_test(undirected):
     graph = gp.Graph(undirected)
@@ -10,15 +12,26 @@ def generate_graph_test(undirected):
         graph.insert_vertex(i)
    
     graph.insert_edge(graph.get_vertex(0),graph.get_vertex(1),4)
-    graph.insert_edge(graph.get_vertex(1),graph.get_vertex(2),7)
-    graph.insert_edge(graph.get_vertex(2),graph.get_vertex(3),1)
-    graph.insert_edge(graph.get_vertex(3),graph.get_vertex(0),8)
-    graph.insert_edge(graph.get_vertex(2),graph.get_vertex(4),3)
-    graph.insert_edge(graph.get_vertex(4),graph.get_vertex(5),4)
-    graph.insert_edge(graph.get_vertex(5),graph.get_vertex(6),6)
-    graph.insert_edge(graph.get_vertex(6),graph.get_vertex(4),2)
-    graph.insert_edge(graph.get_vertex(7),graph.get_vertex(6),6)
-    graph.insert_edge(graph.get_vertex(7),graph.get_vertex(8),0)
+    graph.insert_edge(graph.get_vertex(0),graph.get_vertex(7),8)
+
+    graph.insert_edge(graph.get_vertex(1),graph.get_vertex(7),11)
+    graph.insert_edge(graph.get_vertex(1),graph.get_vertex(2),8)
+
+    graph.insert_edge(graph.get_vertex(2),graph.get_vertex(3),7)
+    graph.insert_edge(graph.get_vertex(2),graph.get_vertex(8),2)
+    graph.insert_edge(graph.get_vertex(2),graph.get_vertex(5),4)
+    
+    graph.insert_edge(graph.get_vertex(3),graph.get_vertex(4),9)
+    graph.insert_edge(graph.get_vertex(3),graph.get_vertex(5),14)
+
+    graph.insert_edge(graph.get_vertex(4),graph.get_vertex(5),10)
+
+    graph.insert_edge(graph.get_vertex(5),graph.get_vertex(6),2)
+    
+    graph.insert_edge(graph.get_vertex(6),graph.get_vertex(7),1)
+    graph.insert_edge(graph.get_vertex(6),graph.get_vertex(8),6)
+
+    graph.insert_edge(graph.get_vertex(7),graph.get_vertex(8),7)
 
     return graph
 
@@ -38,7 +51,7 @@ def generate_graph(n_vertex, n_edges, undirected):
         vertex_2 = graph.get_vertex(alphabet[random.randint(0,n_vertex-1)])
 
         if vertex_1 != vertex_2 and graph.validate_edges(vertex_1,vertex_2):
-            weight = random.randint(0,20)
+            weight = random.randint(0,50)
             graph.insert_edge(vertex_1, vertex_2, weight)  
             i+=1
 
@@ -48,12 +61,16 @@ def generate_graph(n_vertex, n_edges, undirected):
 
 
 if __name__ == "__main__":
-
-    graph = generate_graph(5,10,False)
+    graph = generate_graph_test(True)
     graph.show()
-
     print("")
 
-    min_tree = graph.dijkstra('a')
-    min_tree.show()
+    graph.kruskal().show()
+    print("")
+
+    graph.prim(0).show()
     
+
+
+    
+

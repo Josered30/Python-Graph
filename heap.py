@@ -21,10 +21,10 @@ class Heap(object):
         right_child = (2*index)+2
         new_index = index
 
-        if left_child < self.heap_size and self.comparation(self.__heap[index],self.__heap[left_child]):
+        if left_child < self.heap_size and self.comparation(self.__heap[left_child],self.__heap[index]):
             new_index = left_child
 
-        if  right_child < self.heap_size and self.comparation(self.__heap[new_index],self.__heap[right_child]):
+        if  right_child < self.heap_size and self.comparation(self.__heap[right_child],self.__heap[new_index]):
             new_index = right_child
         
         if  new_index != index:
@@ -33,8 +33,8 @@ class Heap(object):
 
 
     def heapify(self):
-        if self.heap_size > 1:
-            self.__heapify_down_util(0)
+        for i in range(self.heap_size//2, 0, -1):
+            self.__heapify_down_util(i)
 
 
     def insert(self, data):
@@ -76,17 +76,20 @@ class Heap(object):
 
 
     def extract(self):
-        element = self.__heap[0]
-        self.__heap[0] = self.__heap[self.heap_size-1]
-        self.__heap.pop()
-        self.heap_size -= 1
+        if self.heap_size > 0:
+            element = self.__heap[0]
+            self.__heap[0] = self.__heap[self.heap_size-1]
+            self.__heap.pop()
+            self.heap_size -= 1
 
-        self.heapify()
-        return element
+            self.__heapify_down_util(0)
+            return element
+        else:
+            return None
         
 
     def get_top(self):
-        return self.__heap[0]
+        return self.__heap[0] if self.heap_size > 0 else None
 
 
     def get_heap(self):
