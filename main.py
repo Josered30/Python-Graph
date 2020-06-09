@@ -61,16 +61,18 @@ def generate_graph(n_vertex, n_edges, undirected):
 
 
 if __name__ == "__main__":
-    graph = generate_graph_test(True)
+    graph = generate_graph_test(False)
     graph.show()
     print("")
 
-    graph.kruskal().show()
+    #graph.kruskal().show()
+    #print("")
+
+    graph.dijkstra(0).show()
     print("")
 
-    graph.prim(0).show()
-    
-
+    graph.bellman_ford(0).show()
+    print("")
 
     
 

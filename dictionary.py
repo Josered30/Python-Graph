@@ -7,5 +7,4 @@ class dictionary(dict):
     # Function to add key:value 
     def add(self, key, value): 
         self[key] = value 
-        #self.add(key, value)
   

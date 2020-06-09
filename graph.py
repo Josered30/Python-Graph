@@ -554,7 +554,7 @@ class Graph:
         
 
     def find(self,arr,index):
-         #While arr[index] have parent -  If index is parent of itself, then arr[index] < 0 so index = index 
+        #While arr[index] have parent -  If index is parent of itself, then arr[index] < 0 so index = index 
         while arr[index] >= 0:
             index = arr[index]
         return index   
@@ -608,7 +608,6 @@ class Graph:
 
     
     def kruskal(self):
-
         if self.undirected:
             edges_queue = heap.Heap(lambda a,b:(a.weight < b.weight), False)
             mst = Graph(self.undirected)
@@ -642,11 +641,48 @@ class Graph:
                     mst.erase_edge(source_vertex, target_vertex)
                     counter -= 1
 
-
             return mst
 
         else:
             return None
+
+    
+    def bellman_ford(self, origin):
+        elements = dct.dictionary()
+
+        for vertex in self.__vertexs:
+            elements.add(vertex.data, InfoElement(vertex))   
+        elements[origin].accumulated_cost = 0
+
+
+        for i in range(self.size-1):
+            for vertex in self.__vertexs:
+                for edge in vertex.edge_list:
+                    last_cost = elements[edge.target_vertex.data].accumulated_cost
+                    new_cost = elements[edge.source_vertex.data].accumulated_cost + edge.weight
+
+                    if last_cost > new_cost:
+                        elements[edge.target_vertex.data].accumulated_cost = new_cost
+                        elements[edge.target_vertex.data].last_vertex =  elements[edge.source_vertex.data]
+                        elements[edge.target_vertex.data].cost = edge.weight
+        
+
+                  
+        for vertex in self.__vertexs:
+            for edge in vertex.edge_list: 
+                last_cost = elements[edge.target_vertex.data].accumulated_cost
+                new_cost = elements[edge.source_vertex.data].accumulated_cost + edge.weight
+
+                if last_cost > new_cost: 
+                    print("Negative cicle")
+                    return None
+
+        return self.__graph_from_dictionary(elements)
+
+
+        
+
+
 
                 
            
