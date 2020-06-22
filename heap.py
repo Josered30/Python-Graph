@@ -1,11 +1,12 @@
 class Heap(object):
     
-    def __init__(self, comparation, heap_type):
+    def __init__(self, comparation, heap_type, finding = lambda x,y: x==y):
         super().__init__()
         self.__heap = []
         self.comparation = comparation
         self.heap_size = 0
         self.heap_type = heap_type
+        self.finding = finding
 
 
     def __heapify_up_util(self, new_index):  
@@ -33,7 +34,7 @@ class Heap(object):
 
 
     def heapify(self):
-        for i in range(self.heap_size//2, 0, -1):
+        for i in range(self.heap_size//2, -1, -1):
             self.__heapify_down_util(i)
 
 
@@ -61,11 +62,17 @@ class Heap(object):
                 self.__heapify_down_util(index)    
 
 
-    def update_v2(self, index, new_data):
-        aux = self.get_element(index)
+
+    def update_v2(self, index ,new_data):
         self.delete(index)
         self.insert(new_data)
 
+
+    def get_element(self, data):
+        for index, i in enumerate(self.__heap):
+            if self.finding(data, i):
+                return (index,i)
+        return (None,None)
 
     def delete(self, index):
         self.__heap[index] = self.__heap[self.heap_size-1]
@@ -103,7 +110,7 @@ class Heap(object):
         self.heap_size += 1
         self.__heap.append(data)
 
-    def get_element(self, index):
+    def get_element_by_index(self, index):
         return self.__heap[index]
 
     

@@ -11,8 +11,7 @@ class InfoElement:
         self.cost=sys.maxsize
         self.accumulated_cost = sys.maxsize
         self.visited=False
-    
-    
+
 
 class Graph:
 
@@ -330,114 +329,120 @@ class Graph:
             return False
 
 
-    def __get_element_index(self, priority_queue, element):  
-        for i in range(priority_queue.heap_size):
-            if priority_queue.get_element(i) == element:
-                return i
-
-            
-    def __graph_from_dictionary(self, elements_dictionary):  
+    def __graph_from_info_elements(self, elements):  
         graph = Graph(self.undirected)
 
         for vertexs in self.__vertexs:
             graph.insert_vertex(vertexs.data)
 
-        for key, elements in elements_dictionary.items():
-            if elements.last_vertex != None:
-                origin = graph.get_vertex_by_index(elements.last_vertex.vertex.index)
-                target = graph.get_vertex_by_index(elements.vertex.index)
-                weight = elements.cost
-                graph.insert_edge(origin,target, weight)
+        if type(elements) is list:
+            for element in elements:
+                if element.last_vertex != None:
+                    origin = graph.get_vertex_by_index(element.last_vertex.vertex.index)
+                    target = graph.get_vertex_by_index(element.vertex.index)
+                    weight = element.cost
+                    graph.insert_edge(origin,target, weight)
         
+        elif type(elements) is dct.dictionary:
+            for key, element in elements.items():
+                if element.last_vertex != None:
+                    origin = graph.get_vertex_by_index(element.last_vertex.vertex.index)
+                    target = graph.get_vertex_by_index(element.vertex.index)
+                    weight = element.cost
+                    graph.insert_edge(origin,target, weight)
+
         return graph
 
 
-    def __dijkstra_util(self, actual_vertex, dijkstra_elements, priority_queue):
+    def __dijkstra_util(self, actual_vertex: InfoElement, done: list , priority_queue: heap.Heap):
+        
+       
         for edge in actual_vertex.vertex.edge_list:
-            element = dijkstra_elements[edge.target_vertex.data]
-            new_cost = actual_vertex.accumulated_cost + edge.weight
-             
-            if element.visited == False: 
+            element = priority_queue.get_element(edge.target_vertex)[1]
+
+            if element != None and element.visited == False :
+                new_cost = actual_vertex.accumulated_cost + edge.weight
+
                 #Relaxation 
                 if element.accumulated_cost > new_cost:
                     element.cost = edge.weight
                     element.accumulated_cost = new_cost
                     element.last_vertex = actual_vertex
 
-                    if element not in priority_queue.get_heap():
-                        priority_queue.insert(element)
-                    else:
-                        priority_queue.update_v2(self.__get_element_index(priority_queue,element),element)
+        priority_queue.heapify()    
 
         #No others elements to visit
         if priority_queue.heap_size == 0:
-            return dijkstra_elements
+            return done
+
 
         #Lightest vertex
         top_element = priority_queue.extract()
         top_element.visited = True
-        return self.__dijkstra_util(top_element, dijkstra_elements, priority_queue)
+        done.append(top_element)
+        return self.__dijkstra_util(top_element, done, priority_queue)
 
 
     def dijkstra(self, origin):
-        priority_queue = heap.Heap(lambda a,b:(a.cost < b.cost),False)
-        dijkstra_elements = dct.dictionary()
 
-        for i in self.__vertexs:
-            dijkstra_elements.add(i.data, InfoElement(i))
-        
-        origin_element = dijkstra_elements[origin]
+        priority_queue = heap.Heap(lambda a,b:(a.cost < b.cost), False, lambda a,b: (a == b.vertex))
+        done = []
+
+        origin_element = InfoElement(origin)
         origin_element.cost = 0
         origin_element.accumulated_cost = 0
         origin_element.visited = True
+        priority_queue.insert(origin_element)
 
-        dijkstra_list = self.__dijkstra_util(origin_element, dijkstra_elements, priority_queue)
+        for i in self.__vertexs:
+            if i!= origin:
+                priority_queue.insert(InfoElement(i))
+                
+        dijkstra_list = self.__dijkstra_util(origin_element, done, priority_queue)    
+        return self.__graph_from_info_elements(dijkstra_list)
 
-        return self.__graph_from_dictionary(dijkstra_list)
 
 
-
-    def __prim_util(self, actual_vertex, prim_elements, priority_queue):
-        
-        for edge in actual_vertex.vertex.edge_list:
-            element = prim_elements[edge.target_vertex.data]
-   
-            if element.visited == False: 
-                #Relaxation
-                if element.cost > edge.weight:
-                    element.cost = edge.weight
-                    element.last_vertex = actual_vertex 
-
-                    if element not in priority_queue.get_heap():
-                        priority_queue.insert(element)
-                    else:
-                        priority_queue.update_v2(self.__get_element_index(priority_queue,element), element)
+    def __prim_util(self, actual_vertex: InfoElement, done: list , priority_queue: heap.Heap):
 
         #No others elements to visit
         if priority_queue.heap_size == 0:
-            return prim_elements
+            return done
+
+        for edge in actual_vertex.vertex.edge_list:
+            element = priority_queue.get_element(edge.target_vertex)[1]
+            if element != None and element.visited == False :
+                #Relaxation 
+                if element.accumulated_cost > edge.weight:
+                    element.cost = edge.weight
+                    element.last_vertex = actual_vertex
+
+        priority_queue.heapify()    
 
         #Lightest vertex
         top_element = priority_queue.extract()
         top_element.visited = True
-        return self.__prim_util(top_element, prim_elements, priority_queue)
+        done.append(top_element)
+        return self.__prim_util(top_element, done, priority_queue)
 
 
     def prim(self,origin):
 
-        priority_queue = heap.Heap(lambda a,b:(a.cost < b.cost),False)
-        prim_elements = dct.dictionary()
-        
-        for i in self.__vertexs:
-            prim_elements.add(i.data, InfoElement(i))
-        
-        origin_element = prim_elements[origin]
+        priority_queue = heap.Heap(lambda a,b:(a.cost < b.cost), False, lambda a,b: (a == b.vertex))
+        done = []
+
+        origin_element = InfoElement(origin)
         origin_element.cost = 0
         origin_element.visited = True
+        priority_queue.insert(origin_element)
 
-        minimun_list = self.__prim_util(origin_element, prim_elements, priority_queue)
-       
-        return self.__graph_from_dictionary(minimun_list)
+        for i in self.__vertexs:
+            if i!= origin:
+                priority_queue.insert(InfoElement(i))
+                
+        minimun_list = self.__prim_util(origin_element, done, priority_queue)    
+        return self.__graph_from_info_elements(minimun_list)
+
 
     
         
@@ -660,7 +665,7 @@ class Graph:
                 for edge in vertex.edge_list:
                     last_cost = elements[edge.target_vertex.data].accumulated_cost
                     new_cost = elements[edge.source_vertex.data].accumulated_cost + edge.weight
-
+                    
                     if last_cost > new_cost:
                         elements[edge.target_vertex.data].accumulated_cost = new_cost
                         elements[edge.target_vertex.data].last_vertex =  elements[edge.source_vertex.data]
@@ -677,7 +682,7 @@ class Graph:
                     print("Negative cicle")
                     return None
 
-        return self.__graph_from_dictionary(elements)
+        return self.__graph_from_info_elements(elements)
 
 
         
